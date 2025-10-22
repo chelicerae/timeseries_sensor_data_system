@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Query
+from fastapi import FastAPI, HTTPException, Query
 from typing import Any, Tuple
 from datetime import datetime
 import os
@@ -61,9 +61,9 @@ async def run_query(query: str, params: Tuple = ()) -> Any:
 
 @app.get("/get_range")
 async def get_data(
-    sensor_id: str,
-    start: datetime,
-    end: datetime,
+    sensor_id: str = Query(..., description="ID of the sensor to filter"),
+    start: datetime = Query(..., description="Start timestamp in ISO 8601 format"),
+    end: datetime = Query(..., description="End timestamp in ISO 8601 format"),
 ) -> dict:
     query = """
         SELECT * 
@@ -79,9 +79,9 @@ async def get_data(
 
 @app.get("/min")
 async def get_min_value(
-    sensor_id: str,
-    start: datetime,
-    end: datetime,
+    sensor_id: str = Query(..., description="ID of the sensor to filter"),
+    start: datetime = Query(..., description="Start timestamp in ISO 8601 format"),
+    end: datetime = Query(..., description="End timestamp in ISO 8601 format"),
 ) -> dict:
     query = """
         SELECT MIN(value) AS min_value
@@ -95,7 +95,9 @@ async def get_min_value(
 
 
 @app.get("/hourly")
-async def get_hourly_data(sensor_id: str) -> list[dict]:
+async def get_hourly_data(
+    sensor_id: str = Query(..., description="ID of the sensor to filter")
+) -> list[dict]:
     query = """
     SELECT bucket AS timestamp,
            avg_value AS avg,
